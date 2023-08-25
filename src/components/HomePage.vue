@@ -63,11 +63,11 @@
                 <CheckSquareOutlined />
               </span>
               {{ fileName }}
-              <span class="trash-button" v-if="hoveredItem === index" type="delete"
-                @click.stop="deleteTestingFile(index)">
-                <DeleteOutlined />
-              </span>
             </div>
+            <span class="trash-button" v-if="hoveredItem === index" type="delete" @click.stop="deleteTestingFile(index)">
+              <DeleteOutlined />
+            </span>
+
           </a-list-item>
         </a-list>
       </div>
@@ -316,10 +316,6 @@ export default {
 }
 
 .check-icon {
-  position: absolute;
-  left: 5px;
-  top: 50%;
-  transform: translateY(-50%);
   font-size: 16px;
   color: #ffffff;
 }
