@@ -7,6 +7,7 @@
         <div>
           <h3>训练数据</h3>
         </div>
+        <!-- 上传按钮 -->
         <div style="margin-top: 10px;margin-bottom: 10px;">
           <a-upload-dragger :multiple="true" action="#" :before-upload="handleTrainFileUpload" accept=".csv"
             :show-upload-list="false">
@@ -15,21 +16,25 @@
             </p>
             <p class="ant-upload-text" style="font-size: small;">单击或拖动文件到此区域进行上传</p>
             <p class="ant-upload-hint" style="font-size: small;">
-              支持单个或批量上传。
+              支持单个或批量上传
             </p>
           </a-upload-dragger>
         </div>
 
+        <!-- 训练数据显示 -->
         <a-list>
-          <!-- 添加鼠标悬浮事件处理和垃圾桶图标 -->
+          <!-- 添加鼠标悬浮事件处理 -->
           <a-list-item v-for="(fileName, index) in trainingFiles" :key="index" @click="selectTrainingFile(index)"
             :class="{ 'list-item-content': true, 'highlighted': selectedTrainingIndex === index }"
             @mouseenter="handleListItemHover(true, index)" @mouseleave="handleListItemHover(false, index)">
+            <!-- 打钩icon -->
             <span class="check-icon" v-if="selectedTrainingIndex === index">
               <CheckSquareOutlined />
             </span>
             {{ fileName }}
-            <span class="trash-button" v-if="hoveredItem === index" type="delete" @click.stop="deleteTrainingFile(index)">
+            <!-- 垃圾桶icon -->
+            <span class="trash-button" v-if="hoveredItem === index" type="delete"
+              @click.stop="deleteFile(fileName, 'train', index)">
               <DeleteOutlined />
             </span>
           </a-list-item>
@@ -37,7 +42,7 @@
       </div>
 
       <!-- 测试数据 -->
-      <div class="data-card">
+      <div class=" data-card">
         <div>
           <h3>测试数据</h3>
         </div>
@@ -49,22 +54,28 @@
             </p>
             <p class="ant-upload-text" style="font-size: small;">单击或拖动文件到此区域进行上传</p>
             <p class="ant-upload-hint" style="font-size: small;">
-              支持单个或批量上传。
+              支持单个或批量上传
             </p>
           </a-upload-dragger>
         </div>
+
+        <!-- 测试数据显示 -->
         <a-list>
-          <!-- 添加鼠标悬浮事件处理和垃圾桶图标 -->
+          <!-- 添加鼠标悬浮事件处理 -->
           <a-list-item v-for="(fileName, index) in testingFiles" :key="index" @click="selectTestingFile(index)"
             :class="{ 'list-item-content': true, 'highlighted': selectedTestingIndex === index }"
             @mouseenter="handleListItemHover(true, index)" @mouseleave="handleListItemHover(false, index)">
             <div>
+              <!-- 打钩icon -->
               <span class="check-icon" v-if="selectedTestingIndex === index">
                 <CheckSquareOutlined />
               </span>
+              <!-- 打钩icon -->
               {{ fileName }}
             </div>
-            <span class="trash-button" v-if="hoveredItem === index" type="delete" @click.stop="deleteTestingFile(index)">
+            <!-- 垃圾桶icon -->
+            <span class="trash-button" v-if="hoveredItem === index" type="delete"
+              @click.stop="deleteFile(fileName, 'test', index)">
               <DeleteOutlined />
             </span>
 
@@ -99,8 +110,11 @@
 <script>
 import { Button, UploadDragger } from 'ant-design-vue';
 import { List } from 'ant-design-vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { UploadOutlined, CheckSquareOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import API_ROUTES from "@/api/api";
+import { backendIP } from "@/api/backend";
+import axios from 'axios';
 
 export default {
   name: 'HomePage',
@@ -112,6 +126,9 @@ export default {
     UploadOutlined, CheckSquareOutlined, DeleteOutlined
   },
   setup() {
+    // 设置 axios 的 baseURL
+    axios.defaults.baseURL = backendIP;
+
     // 算法选择
     const selectedOption = ref(null);
 
@@ -133,31 +150,75 @@ export default {
     }
 
     // 训练文件上传
-    const handleTrainFileUpload = (file) => {
-      // 获取文件名并存储
-      const fileName = file.name;
-      if (fileName) {
-        trainingFiles.value.push(fileName);
-      }
-      return false;
-    };
-    // 测试文件上传
-    const handleTestFileUpload = (file) => {
-      // 获取文件名并存储
-      const fileName = file.name;
-      if (fileName) {
-        testingFiles.value.push(fileName);
+    const handleTrainFileUpload = async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const response = await axios.post(API_ROUTES.uploadData, formData, {
+          params: { type: "train" }
+        });
+        if (response.data.message === 'success') {
+          trainingFiles.value.push(file.name);
+        }
+      } catch (error) {
+        console.error('上传训练文件时出现错误：', error);
       }
       return false;
     };
 
+    // 测试文件上传
+    const handleTestFileUpload = async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const response = await axios.post(API_ROUTES.uploadData, formData, {
+          params: { type: "test" }
+        });
+        if (response.data.message === 'success') {
+          testingFiles.value.push(file.name);
+        }
+      } catch (error) {
+        console.error('上传测试文件时出现错误：', error);
+      }
+      return false;
+    };
+
+
+    // 获取数据列表
+    const fetchFileList = async (data_type) => {
+      try {
+        const response = await axios.get(API_ROUTES.DataList, {
+          params: { type: data_type }
+        });
+        if (response.data.message === 'success') {
+          return response.data.data;
+        }
+      } catch (error) {
+        console.error('获取数据列表时出现错误：', error);
+      }
+      return [];
+    };
+
+    // 在组件加载后获取数据列表
+    onMounted(async () => {
+      trainingFiles.value = await fetchFileList('train');
+      testingFiles.value = await fetchFileList('test');
+    });
 
     // 删除数据
-    const deleteTrainingFile = (index) => {
-      trainingFiles.value.splice(index, 1);
-    };
-    const deleteTestingFile = (index) => {
-      testingFiles.value.splice(index, 1);
+    const deleteFile = async (fileName, data_type, index) => {
+      try {
+        await axios.get(API_ROUTES.deleteData, {
+          params: { file_name: fileName, type: data_type }
+        });
+        if (data_type === 'train') {
+          trainingFiles.value.splice(index, 1);
+        } else if (data_type === 'test') {
+          testingFiles.value.splice(index, 1);
+        }
+      } catch (error) {
+        console.error('删除文件时出现错误：', error);
+      }
     };
 
     // 选中训练数据
@@ -200,6 +261,7 @@ export default {
 
     // 返回需要暴露给模板的数据和方法
     return {
+      fetchFileList,
       handleListItemHover,
       hoveredItem,
       selectTestingFile,
@@ -212,8 +274,7 @@ export default {
       handleTestFileUpload,
       selectedOption,
       runProcess,
-      deleteTrainingFile,
-      deleteTestingFile
+      deleteFile
     };
   }
 }
