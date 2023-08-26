@@ -87,10 +87,10 @@
       <div class="process-card">
         <div class="process-controls">
           选择算法：
-          <a-select v-model="selectedOption" class="option-select" placeholder="PCA">
-            <a-select-option value="option1">PCA</a-select-option>
-            <a-select-option value="option2">CAE</a-select-option>
-            <!-- 添加更多选项 -->
+          <a-select show-search v-model:value="selectedOption" class="option-select" placeholder="PCA">
+            <a-select-option value="pca">PCA</a-select-option>
+            <a-select-option value="cva">CVA</a-select-option>
+            <a-select-option value="ae">AE</a-select-option>
           </a-select>
           <a-button type="primary" @click="runProcess" class="run-button">运行</a-button>
         </div>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { Button, UploadDragger } from 'ant-design-vue';
+import { Button, UploadDragger, Select } from 'ant-design-vue';
 import { List } from 'ant-design-vue';
 import { ref, onMounted } from 'vue';
 import { UploadOutlined, CheckSquareOutlined, DeleteOutlined } from '@ant-design/icons-vue';
@@ -119,6 +119,7 @@ import axios from 'axios';
 export default {
   name: 'HomePage',
   components: {
+    ASelect: Select,
     AUploadDragger: UploadDragger,
     AButton: Button,
     AList: List,
@@ -130,7 +131,7 @@ export default {
     axios.defaults.baseURL = backendIP;
 
     // 算法选择
-    const selectedOption = ref(null);
+    const selectedOption = ref('pca');
 
     // 文件上传相关
     const trainingFiles = ref([]);
@@ -244,23 +245,49 @@ export default {
     };
 
 
+    // 过程监测API请求函数
+    const runCVA = async (train_name, test_name) => {
+      try {
+        const response = await axios.post(API_ROUTES.CVA, {
+          train_name: train_name,
+          test_name: test_name,
+        });
+        if (response.data.message === 'success') {
+          return response.data.data;
+        }
+      } catch (error) {
+        console.error('运行CVA时出现错误：', error);
+      }
+    };
+
+
     // 运行过程监测的逻辑
-    const runProcess = () => {
+    const runProcess = async () => {
+      console.log('runProcess')
 
       // 在运行过程中，使用选中的训练集索引和测试集索引来获取对应的文件名
       const selectedTrainingFileName = trainingFiles.value[selectedTrainingIndex.value];
       const selectedTestingFileName = testingFiles.value[selectedTestingIndex.value];
 
       // 执行模型训练和推理操作
-      // 使用 selectedTrainingFileName 和 selectedTestingFileName 进行相应操作
-      console.log(selectedTrainingFileName)
-      console.log(selectedTestingFileName)
+      if (selectedOption.value == 'cva') {
+        console.log('cva')
+        const res = await runCVA(selectedTrainingFileName, selectedTestingFileName);
+        console.log(res)
+      }
+      else if (selectedOption.value == 'pca') {
+        console.log('pca')
+      }
+      else {
+        console.log('else')
+      }
 
       // 在运行完模型训练和推理后，你可以在 chart-output 和 text-output 区域展示结果
     };
 
     // 返回需要暴露给模板的数据和方法
     return {
+      runCVA,
       fetchFileList,
       handleListItemHover,
       hoveredItem,
