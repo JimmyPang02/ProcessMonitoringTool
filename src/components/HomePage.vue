@@ -97,7 +97,10 @@
 
         <div class="chart-output">
           <!-- 图表输出区域 -->
+          <div v-html="plotHTML"></div>
+          <iframe :src="chartUrl" frameborder="0" width="800" height="600"></iframe>
         </div>
+        <div v-html="plotHTML.value"></div>
 
         <div class="text-output">
           <!-- 文本输出区域 -->
@@ -144,6 +147,10 @@ export default {
     const selectedTrainingIndex = ref(null);
     const selectedTestingIndex = ref(null);
 
+    // 图表输出区域的 HTML
+    let plotHTML = ref('');
+    let chartUrl = ref('');
+    //const chartUrl = ref(backendIP + '/run/cva');
 
     // 处理列表项的鼠标悬浮事件
     const handleListItemHover = (isHovered, index) => {
@@ -252,9 +259,7 @@ export default {
           train_name: train_name,
           test_name: test_name,
         });
-        if (response.data.message === 'success') {
-          return response.data.data;
-        }
+        return response.data;
       } catch (error) {
         console.error('运行CVA时出现错误：', error);
       }
@@ -273,7 +278,9 @@ export default {
       if (selectedOption.value == 'cva') {
         console.log('cva')
         const res = await runCVA(selectedTrainingFileName, selectedTestingFileName);
-        console.log(res)
+        console.log(res.html_url)
+        chartUrl.value = res.html_url;
+
       }
       else if (selectedOption.value == 'pca') {
         console.log('pca')
@@ -287,6 +294,7 @@ export default {
 
     // 返回需要暴露给模板的数据和方法
     return {
+      chartUrl,
       runCVA,
       fetchFileList,
       handleListItemHover,
@@ -301,7 +309,8 @@ export default {
       handleTestFileUpload,
       selectedOption,
       runProcess,
-      deleteFile
+      deleteFile,
+      plotHTML
     };
   }
 }
