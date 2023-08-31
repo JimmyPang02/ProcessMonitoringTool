@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow,Menu } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 // 我的注释
 // import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
@@ -14,8 +14,8 @@ protocol.registerSchemesAsPrivileged([
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1920,
+    height: 1080,
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -25,6 +25,13 @@ async function createWindow() {
     }
   })
 
+  // 创建一个空白的菜单模板
+  const menuTemplate = [];
+
+  // 将菜单模板设置为应用程序的主菜单
+  const mainMenu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(mainMenu);
+  
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)

@@ -2,7 +2,7 @@ const API_ROUTES = {
     uploadData: '/upload',
     DataList: '/DataList',
     deleteData: '/delete',
-    CVA: '/run/cva'
+    Run: '/run'
   };
   
   export default API_ROUTES;
