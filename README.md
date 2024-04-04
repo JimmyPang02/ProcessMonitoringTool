@@ -1,112 +1,104 @@
-# ProcessMonitoringTool(FDDTool)
-
+# ProcessMonitoringTool (FDDTool)
+[English](README.md) | [简体中文](README_zh.md)
 > Process monitoring, also known as Fault Detection and Diagnosis (FDD)
 
-本项目实现了一个过程监测的可视化软件——FDDTool
+This project has implemented a visualization software for process monitoring called FDDTool.
 
 ![image-20230831214325514](README/image-20230831214325514.png)
 
-FDDtool的定位是一个用于测试过程监测算法和数据的平台，同时也可以扩展为实时的过程监测工具。
+FDDTool is positioned as a platform for testing process monitoring algorithms and data, which can also be expanded into a real-time process monitoring tool.
 
-它通过采用过程监测算法，对导入的正常数据进行模型训练，随后对导入的故障数据进行过程监测，并将可视化结果返回给前端。
+It utilizes process monitoring algorithms to train models on imported normal data, then performs process monitoring on imported fault data, and returns the visualization results to the front end.
 
-### 算法
+### Algorithms
 
-**目前，软件支持多种过程监测算法，包括 CVA、DiPCA、DiPLS、SVDD、SFA 等**
+**Currently, the software supports a variety of process monitoring algorithms, including CVA, DiPCA, DiPLS, SVDD, SFA, etc.**
 
-> 这些算法位于 FDDTool-backend 文件夹内
+> These algorithms are located in the FDDTool-backend folder.
 
-### **软件技术栈**
+### **Software Technology Stack**
 
-前端：VUE3（前端框架）+Ant Design Vue（样式组件库）+Electron（用于构建桌面应用程序）+Axios（用于与后端进行通信）
+Frontend: VUE3 (frontend framework) + Ant Design Vue (style component library) + Electron (for building desktop applications) + Axios (for communication with the backend)
 
-后端：Python 和 FastAPI（用于后端服务和部分过程监测算法）+MATLAB（另一部分过程监测算法）
+Backend: Python and FastAPI (for backend services and some process monitoring algorithms) + MATLAB (for other process monitoring algorithms)
 
+# Software Usage
 
+### **Environment Configuration**
 
-# 软件使用
+> The software adopts a front-end and back-end separated architecture. Before performing various operations, make sure that the backend service is started.
 
-### **环境配置**
+Here are the environment configurations required for running the backend code locally:
 
-> 本软件采用前后端分离的架构。在进行各种操作之前，需要确保后端服务已启动。
+- Python libraries: FastAPI (for backend services), Plotly (for plotting)
+- Python's MATLAB engine (for calling MATLAB code)
+- MATLAB 2020a or later version (for compiling and running MATLAB code)
 
-以下是本地运行后端代码所需的环境配置：
+### **Usage Steps**
 
-- Python库：FastAPI（用于后端服务）、Plotly（用于绘图）
-- Python的MATLAB引擎（用于调用MATLAB代码）
-- MATLAB 2020a或更高版本（用于编译和运行MATLAB代码）
+#### 1.**Start the backend service** (FDDTool-backend)
 
-### **使用步骤**
-
-#### 1.**开启后端服务**(FDDTool-backend)
-
-- 可以通过运行main.py开启后端服务
+- The backend service can be started by running main.py.
 
   ![image-20230927204509650](README/image-20230927204509650.png)
 
-- （可选）也可以在后端代码文件夹内的路径下打开终端，执行`uvicorn main:app --reload`命令
+- (Optional) Alternatively, open a terminal in the backend code folder path and execute the command `uvicorn main:app --reload`.
 
-开启服务后可以在终端监听前端的请求
+After starting the service, you can listen for frontend requests in the terminal.
 
 ![image-20230927204612013](README/image-20230927204612013-16958209249991.png)
 
+#### 2. Run the frontend of the software (FDDTool-frontend)
 
-
-#### 2.运行软件前端(FDDTool-frontend)
-
-- 在前端代码文件夹内的路径下打开终端，执行以下命令
+- Open a terminal in the path of the frontend code folder and execute the following commands:
 
 ```bash
-# 安装依赖包
+# Install dependency packages
 yarn install
 
-# 根据需要执行以下命令
-yarn run serve        # 启动 Web 端服务
-yarn run build        # 打包 Web 端代码
-yarn electron:serve   # 启动桌面端应用
-yarn electron:build   # 打包桌面端应用
+# Execute one of the following commands as needed
+yarn run serve        # Start the Web service
+yarn run build        # Package the Web code
+yarn electron:serve   # Start the desktop application
+yarn electron:build   # Package the desktop application
 ```
 
-> 软件同时支持web端和桌面端
+> The software supports both web and desktop versions.
 
 ![image-20230831213428848](README/image-20230831213428848.png)
 
+#### **3. Upload Data**
 
+You can complete the file upload by clicking the upload area or dragging and dropping files into the upload area. The names of the uploaded data will be displayed in the software.
 
-####  **3.上传数据**
+> Note 1: Only CSV files are supported.
+> 
+> Note 2: For the uploaded fault data, please ensure the last column contains fault label information, i.e., the column indicating the degree of fault or whether there is a fault.
 
-您可以点击上传区域或将文件拖放到上传区域来完成文件上传。上传的数据名称将会在软件中显示。
+**Data sets in the dataset folder can be used for software and algorithm testing:**
 
-> 注意1：仅支持CSV文件。
->
-> 注意2：对于上传的故障数据，请确保数据的最后一列包含故障标签信息，即表示故障程度或是否故障的列。
+- "T1.csv, T2.csv, T3.csv" are data when the system is running normally.
+- "Set_EvoFault1_1.csv" and other files are data when the system has faults (and include a fault label column).
 
-**数据集文件夹中的数据可用于软件和算法的测试：**
+#### 4. Click to Select Data
 
-- "T1.csv、T2.csv、T3.csv" 是系统正常运行时的数据
-- "Set_EvoFault1_1.csv" 等文件是系统发生故障时的数据（并且包含故障标签列）
-
-
-
-#### 4. 点击选中数据
-
-（应包括正常和故障数据）
+(This should include both normal and fault data.)
 
 ![image-20230927205753086](README/image-20230927205753086.png)
 
-#### 5.选择算法
+#### 5. Select Algorithm
 
 ![image-20230927210429126](README/image-20230927210429126.png)
 
-#### 6.**运行设置** （可选）
+#### 6. **Run Settings** (Optional)
 
-可设置是否计算并返回算法的性能指标
+You can set whether to calculate and return the performance metrics of the algorithm.
 
 ![image-20230927210443406](README/image-20230927210443406.png)
 
-#### 7.点击运行按钮
+#### 7. Click the Run Button
 
-过程监测结果会在下方展示：
+The process monitoring results will be displayed below:
 
 ![image-20230927210514031](README/image-20230927210514031.png)
 
@@ -114,121 +106,120 @@ yarn electron:build   # 打包桌面端应用
 
 
 
-# 其它
 
-### 数据集说明
+# Other
 
-Cranfield Multiphase Flow Facility获取的三相流数据集
+### Dataset Description
 
-> reference：https://www.kaggle.com/datasets/afrniomelo/cranfield/discussion
+Three-phase flow dataset obtained from the Cranfield Multiphase Flow Facility.
 
-原始数据集中：‘Training.mat’文件是正常运行时的数据，而’FaultCase1-6.mat’是发生不同故障时的数据
+> reference: https://www.kaggle.com/datasets/afrniomelo/cranfield/discussion
 
-本项目对原始数据集做了一定处理：
+In the original dataset: The 'Training.mat' file contains data during normal operation, while 'FaultCase1-6.mat' files contain data during various faults.
 
-- 数据集处理1：为方便python处理，编写脚本把mat数据的所有矩阵数据都导出为csv文件保存
-- 数据集处理2：为方便计算检出率等指标，将原本代表故障程度的EvoFault数据和故障过程变量Set数据进行了合并，将其拼接在Set数据的最后一列
+This project has made certain modifications to the original dataset:
 
+- Dataset processing 1: For easier processing by Python, a script was written to export all matrix data from mat files to CSV files for storage.
+- Dataset processing 2: To facilitate the calculation of detection rates and other metrics, the EvoFault data representing the degree of faults and the fault process variable Set data were combined, appending it to the last column of the Set data.
 
+### Backend API Documentation
 
-### 后端API文档
+1. **Data Import**
 
-1. **数据导入**
+URL: `/upload`
 
-URL：`/upload`
+Method: `POST`
 
-方法：`POST`
+Description: Imports data and stores it in the backend service.
 
-描述：导入数据到，并存储在服务后台
+Request Parameters:
 
-请求参数：
+| Parameter Name | Parameter Value | Description |
+| -------------- | --------------- | ----------- |
+| file           |                 | File        |
+| type           | "normal"        | Data type   |
 
-| 参数名 | 参数值   | 参数描述 |
-| ------ | -------- | -------- |
-| file   |          | 文件     |
-| type   | “normal” | 数据类型 |
-
-响应：
+Response:
 
 ```json
 {
-    "message":'success'
+    "message": "success"
 }
 ```
 
 
 
-2. **获取数据列表**
+2. **Retrieve Data List**
 
-URL：`/DataList`
+URL: `/DataList`
 
-方法：`GET`
+Method: `GET`
 
-描述：获取所有正常/故障数据的名称
+Description: Retrieves the names of all normal/fault data.
 
-请求参数：
+Request Parameters:
 
-| 参数名 | 参数值   | 参数描述 |
-| ------ | -------- | -------- |
-| type   | “normal” | 数据类型 |
+| Parameter Name | Parameter Value | Description |
+| -------------- | --------------- | ----------- |
+| type           | "normal"        | Data type   |
 
-响应：
+Response:
 
 ```json
 {
-    "data":["T1.csv","T2.csv","T3.csv"],
-    "message":'success'
+    "data": ["T1.csv", "T2.csv", "T3.csv"],
+    "message": "success"
 }
 ```
 
 
 
-3. **删除数据**
+3. **Delete Data**
 
-URL：`/delete`
+URL: `/delete`
 
-方法：`GET`
+Method: `GET`
 
-描述：根据文件名删除某正常/故障数据
+Description: Deletes specific normal/fault data based on the file name.
 
-请求参数：
+Request Parameters:
 
-| 参数名    | 参数值   | 参数描述 |
-| --------- | -------- | -------- |
-| file_name | "T1.csv" | 文件名   |
-| type      | “normal” | 数据类型 |
+| Parameter Name | Parameter Value | Description |
+| -------------- | --------------- | ----------- |
+| file_name      | "T1.csv"        | File name   |
+| type           | "normal"        | Data type   |
 
-响应：
+Response:
 
 ```json
 {
-    "message":'success'
+    "message": "success"
 }
 ```
 
 
 
-4. 过程监测
+4. **Process Monitoring**
 
-URL：`/run`
+URL: `/run`
 
-方法：`POST`
+Method: `POST`
 
-描述：利用数据训练模型，故障数据中进行过程监测，返回过程监测结果——可视化图表的URL链接
+Description: Uses data to train models and conducts process monitoring on fault data, returning the process monitoring results—URL link to visualization charts.
 
-请求参数：
+Request Parameters:
 
-| 参数名     | 参数值       | 参数描述       |
-| ---------- | ------------ | -------------- |
-| NormalName | “T1.csv”     | 正常数据文件名 |
-| FaultName  | “Set4_1.csv” | 故障数据文件名 |
-| Method     | "CVA"        | 算法名称       |
+| Parameter Name | Parameter Value | Description        |
+| -------------- | --------------- | ------------------ |
+| NormalName     | "T1.csv"        | Normal data file name |
+| FaultName      | "Set4_1.csv"    | Fault data file name |
+| Method         | "CVA"           | Algorithm name       |
 
-响应：
+Response:
 
 ```json
 {
-    "html_url": '127.0.0.1:5000'
+    "html_url": "127.0.0.1:5000"
 }
 ```
 
