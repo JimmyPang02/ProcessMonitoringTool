@@ -1,6 +1,6 @@
 # ProcessMonitoringTool(FDDTool)
-
-> Process monitoring, also known as Fault Detection and Diagnosis (FDD)
+[English](README.md) | [简体中文](README_zh.md)
+> 过程监测，也叫故障检测与诊断
 
 本项目实现了一个过程监测的可视化软件——FDDTool
 
